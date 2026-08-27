@@ -71,14 +71,10 @@ Population figures at each level come from a different INSEE source, so the colu
 
 ## Income ([`income/`](income/))
 
-**`larochelle_iris_income.csv`** — only 48 of the 115 IRIS have values; INSEE itself withholds income figures for areas with too few households, so the rest simply aren't published, not missing due to a filtering error.
+Both files use the same columns — `median_income_eur`, `income_q1_eur`, `income_q3_eur`, `income_d1_eur`, `income_d9_eur` (standard of living per consumption unit), `poverty_rate_pct` (share below 60% of the national median), `d9_d1_ratio` and `gini_index` (inequality measures), and `income_share_activity_pct` / `income_share_pensions_pct` / `income_share_social_benefits_pct` / `income_share_taxes_pct` (where income comes from and what's deducted in taxes).
 
-- `median_income_eur`, `income_q1_eur`, `income_q3_eur`, `income_d1_eur`, `income_d9_eur` — standard of living per consumption unit
-- `poverty_rate_pct` — share below 60% of the national median
-- `d9_d1_ratio`, `gini_index` — inequality measures
-- `income_share_activity_pct`, `income_share_pensions_pct`, `income_share_social_benefits_pct`, `income_share_taxes_pct` — where income comes from and what's deducted in taxes
-
-See [`income/README.md`](income/README.md) for the still-missing commune-level income file.
+- **`larochelle_iris_income.csv`** (48 of 115 IRIS) — INSEE withholds income figures for IRIS with too few households; missing rows aren't a filtering error, they don't exist in the source at all.
+- **`larochelle_communes_income.csv`** (72 rows) — every commune has `median_income_eur`, but the finer breakdown (quartiles, deciles, Gini, income sources) is only published for 29, and `poverty_rate_pct` for just 16 — a different, column-by-column suppression pattern from the IRIS file. See [`income/README.md`](income/README.md) for the exact counts.
 
 ## Employment ([`employment/`](employment/))
 
@@ -116,7 +112,7 @@ Everything here traces back to a specific source — nothing is estimated or inv
 - **Commune boundaries & population** ([`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson), [`population/larochelle_communes_population.csv`](population/larochelle_communes_population.csv)) — [Géoplateforme17](https://www.geoplateforme17.fr), the Charente-Maritime departmental GIS platform (run by Soluris on behalf of the Conseil Départemental), accessed via QGIS rather than a direct file download.
 - **IRIS boundaries** ([`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)) — IGN, via [Géoportail's Contours IRIS page](https://www.geoportail.gouv.fr/donnees/contours-iris) (the WFS service actually used in QGIS is `data.geopf.fr/wfs/ows`, layer `STATISTICALUNITS.IRISGE:iris_ge` — that's an API endpoint, not a browsable page, so it 404s if opened directly in a browser).
 - **IRIS & 200m-grid population** ([`population/larochelle_iris_population.csv`](population/larochelle_iris_population.csv), [`population/larochelle_c200_population.csv`](population/larochelle_c200_population.csv)) — INSEE: [Population en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8268806) and [Filosofi 2021, données carroyées 200m](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243).
-- **IRIS income** ([`income/larochelle_iris_income.csv`](income/larochelle_iris_income.csv)) — INSEE: [Revenus, pauvreté et niveau de vie en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8229323).
+- **IRIS & commune income** ([`income/larochelle_iris_income.csv`](income/larochelle_iris_income.csv), [`income/larochelle_communes_income.csv`](income/larochelle_communes_income.csv)) — INSEE: [Revenus, pauvreté et niveau de vie en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8229323) and [Revenus, pauvreté et niveau de vie en 2021 (communes)](https://www.insee.fr/fr/statistiques/7756855?sommaire=7756859).
 - **Employment by workplace location** ([`employment/larochelle_communes_jobs.csv`](employment/larochelle_communes_jobs.csv)) — INSEE: [Emploi-Population active en 2021 (communes)](https://www.insee.fr/fr/statistiques/8202916?sommaire=8205947).
 - **Amenities** ([`amenities/`](amenities/)) — INSEE: [Base Permanente des Équipements (BPE) 2025](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537).
 
