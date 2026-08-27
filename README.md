@@ -40,14 +40,14 @@ Every data file below (in [`mobility/`](mobility/) and [`population/`](populatio
 
 ## Mobility ([`mobility/`](mobility/))
 
-Home-to-work travel times and distances. All three levels use the exact same columns (same wording as [`mobility/codebook.txt`](mobility/codebook.txt)), weighted by population times jobs for each travel between a pair of individual and job:
+Home-to-work travel times and distances. All three levels use the exact same columns, weighted by population times jobs for each travel between a pair of individual and job:
 
 - **distance** — weighted average road distance from home to work place, in meters
 - **tt_car / tt_bike / tt_walk / tt_transit** — average weighted travel time in minutes between home and work place, by car, bike, walk, and transit
 - **part_transit** — the share (0.5 means 50%) of the population who has access to the transit system; `tt_transit` is calculated for this population only
 - **walktime** — average weighted travel time in minutes between home and the entry station in the transit system (bus, metro, train, ...)
 
-Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows). [`mobility/data.R`](mobility/data.R) is the script that originally built these from raw distance/employment data.
+Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows). [`mobility/source/`](mobility/source/) has `codebook.txt` (the original column definitions) and `data.R` (the script that originally built these from raw distance/employment data).
 
 ## Population ([`population/`](population/))
 
@@ -81,12 +81,12 @@ See [`income/README.md`](income/README.md) for the still-missing commune-level i
 
 ## Amenities ([`amenities/`](amenities/))
 
-**`larochelle_equipements.geojson`** / **`.csv`** (11,019 points) — every school, shop, healthcare facility, sports facility, transit stop, etc. in the area, geolocated:
+**`larochelle_equipements.csv`** (11,019 points) — every school, shop, healthcare facility, sports facility, transit stop, etc. in the area, geolocated:
 
 - `name`, `address`, `postal_code`
 - `COMMUNE`, `nom_commune` — same commune code as everything else, so this can be aggregated to commune/IRIS level (see below)
 - `domain` — one of 7 broad categories (Services aux particuliers, Commerces, Enseignement, Santé, Transports et déplacements, Sports/loisirs et culture, Tourisme); `subdomain_code`, `type_code` — INSEE's finer classification, left as raw codes (see [`amenities/README.md`](amenities/README.md) for how to translate them)
-- `longitude`, `latitude` (CSV only — the GeoJSON has these as the point geometry instead)
+- `longitude`, `latitude` — WGS84, ready to map. There's no separate GeoJSON — in QGIS, add it via Layer → Add Layer → Add Delimited Text Layer with X/Y set to `longitude`/`latitude`.
 
 Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts per commune or IRIS means aggregating by location instead of joining by key:
 
