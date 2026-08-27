@@ -9,7 +9,7 @@ Source: INSEE "Revenus, pauvreté et niveau de vie en 2021 (IRIS)", disposable-i
 - `d9_d1_ratio`, `gini_index` — inequality measures.
 - `income_share_activity_pct`, `income_share_pensions_pct`, `income_share_social_benefits_pct`, `income_share_taxes_pct` — where income comes from (work, pensions, benefits) and what's deducted in taxes.
 
-**Only 48 of the 115 IRIS have values.** This isn't a filtering error — INSEE itself doesn't publish income figures for IRIS with too few households, to protect confidentiality. The other 67 rows just don't exist in the source file at all.
+**Only 48 of the 115 IRIS have values.** This isn't a filtering error — INSEE itself doesn't publish income figures for IRIS with too few households, to protect confidentiality.
 
 ## `larochelle_communes_income.csv` — 72 rows, join on `COMMUNE`
 
