@@ -1,6 +1,6 @@
 # La Rochelle commuting data
 
-Open data on home-to-work commuting, population, income, and amenities for the La Rochelle area (Charente-Maritime, plus 2 communes in Vendée), at three levels of geographic detail.
+Open data on home-to-work commuting, population, income, employment, and amenities for the La Rochelle area (Charente-Maritime, plus 2 communes in Vendée), at three levels of geographic detail.
 
 ```
 .
@@ -8,6 +8,7 @@ Open data on home-to-work commuting, population, income, and amenities for the L
 ├── geo-data/       map boundaries only (join key + geometry)
 ├── population/     population by age, occupation, nationality
 ├── income/         median income, poverty rate, inequality
+├── employment/     number of jobs by workplace location, sector, category
 ├── amenities/      schools, shops, healthcare, transit stops (point layer)
 └── README.md
 ```
@@ -34,7 +35,7 @@ Each level's map shape lives in [`geo-data/`](geo-data/) — geometry and join k
 - [`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)
 - [`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson)
 
-Every data file below (in [`mobility/`](mobility/) and [`population/`](population/)) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). [`geo-data/communes_names.csv`](geo-data/communes_names.csv) maps each `COMMUNE` code to its town name if you want readable labels instead of numbers.
+Every data file below (in [`mobility/`](mobility/), [`population/`](population/), [`income/`](income/), and [`employment/`](employment/)) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). [`geo-data/communes_names.csv`](geo-data/communes_names.csv) maps each `COMMUNE` code to its town name if you want readable labels instead of numbers.
 
 [`amenities/`](amenities/) is the exception — its points already carry their own coordinates, so there's nothing to join. See the Amenities section below for how to aggregate it to a level instead.
 
@@ -79,6 +80,20 @@ Population figures at each level come from a different INSEE source, so the colu
 
 See [`income/README.md`](income/README.md) for the still-missing commune-level income file.
 
+## Employment ([`employment/`](employment/))
+
+The flip side of the population data: where jobs are physically located, not where the people holding them live. Useful for seeing where people commute *to*.
+
+**`larochelle_communes_jobs.csv`** (72 rows) — commune level only; INSEE doesn't publish jobs-at-workplace at IRIS or 200m-grid resolution:
+
+- `jobs_total` — total jobs at the workplace in the commune
+- `jobs_salaried`, `jobs_salaried_female`, `jobs_salaried_parttime` — salaried jobs and the female/part-time subsets
+- `jobs_nonsalaried`, `jobs_nonsalaried_female`, `jobs_nonsalaried_parttime` — self-employed jobs and the female/part-time subsets
+- `jobs_cs1_agriculteurs` … `jobs_cs6_ouvriers` — jobs by socio-professional category (same PCS categories as `population/`'s `pop_cs1`…`pop_cs6`)
+- `jobs_agriculture`, `jobs_industry`, `jobs_construction`, `jobs_commerce_transport_services`, `jobs_public_admin_education_health` — jobs by broad sector
+
+See [`employment/README.md`](employment/README.md) for what's left out (finer sex/status-by-sector cross-tabs, 2015/2010 time series).
+
 ## Amenities ([`amenities/`](amenities/))
 
 **`larochelle_equipements.csv`** (11,019 points) — every school, shop, healthcare facility, sports facility, transit stop, etc. in the area, geolocated:
@@ -102,6 +117,7 @@ Everything here traces back to a specific source — nothing is estimated or inv
 - **IRIS boundaries** ([`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)) — IGN, via [Géoportail's Contours IRIS page](https://www.geoportail.gouv.fr/donnees/contours-iris) (the WFS service actually used in QGIS is `data.geopf.fr/wfs/ows`, layer `STATISTICALUNITS.IRISGE:iris_ge` — that's an API endpoint, not a browsable page, so it 404s if opened directly in a browser).
 - **IRIS & 200m-grid population** ([`population/larochelle_iris_population.csv`](population/larochelle_iris_population.csv), [`population/larochelle_c200_population.csv`](population/larochelle_c200_population.csv)) — INSEE: [Population en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8268806) and [Filosofi 2021, données carroyées 200m](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243).
 - **IRIS income** ([`income/larochelle_iris_income.csv`](income/larochelle_iris_income.csv)) — INSEE: [Revenus, pauvreté et niveau de vie en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8229323).
+- **Employment by workplace location** ([`employment/larochelle_communes_jobs.csv`](employment/larochelle_communes_jobs.csv)) — INSEE: [Emploi-Population active en 2021 (communes)](https://www.insee.fr/fr/statistiques/8202916?sommaire=8205947).
 - **Amenities** ([`amenities/`](amenities/)) — INSEE: [Base Permanente des Équipements (BPE) 2025](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537).
 
 ## Other open data resources
