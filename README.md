@@ -4,8 +4,8 @@ Open data on home-to-work commuting, population, income, employment, and ameniti
 
 ```
 .
-├── mobility/       travel times & distances (car, bike, walk, transit)
 ├── geo-data/       map boundaries only (join key + geometry)
+├── mobility/       travel times & distances (car, bike, walk, transit)
 ├── population/     population by age, occupation, nationality
 ├── income/         median income, poverty rate, inequality
 ├── employment/     number of jobs by workplace location, sector, category
