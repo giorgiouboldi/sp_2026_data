@@ -22,6 +22,12 @@ The data covers the La Rochelle commuting area at three sizes of area — same g
 
 Grid squares roll up into IRIS zones, which roll up into communes.
 
+| Communes — 73 zones | IRIS — 116 zones | 200m grid — 32,700 cells |
+|---|---|---|
+| ![Commune boundaries](img/larochelle_communes_boundary.png) | ![IRIS boundaries](img/larochelle_iris_boundary.png) | ![200m grid](img/larochelle_c200_boundary.png) |
+
+Same area, same zoom level in each image — only the boundaries change. Communes are the fewest, largest shapes; IRIS splits each urban commune into several neighborhood-sized zones (visible as the dense cluster of small polygons around La Rochelle city center); the 200m grid is fine enough that at this zoom it renders as a solid texture rather than individual squares — that's the resolution `c200` data operates at.
+
 Each level's map shape lives in [`geo-data/`](geo-data/) — geometry and join key only, no data values:
 
 - [`geo-data/larochelle_c200_boundary.geojson`](geo-data/larochelle_c200_boundary.geojson) (also has `has_data`, since it covers every grid square, not just the ones with data)
