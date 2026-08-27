@@ -1,0 +1,11 @@
+Files contains for each [commune, iris, carreau 200m INSPIRE] the following information:
+
+[COMMUNE, IRIS, idINS]: localisation information, namely the code of the commune (INSEE code géographique) or the code of the IRIS (INSEE code_iris) or the 200mx200m INSPIRE grid
+
+distance: weighted average road distance from home to work place. Weights are based on population times jobs for each travel between a pair of individual and job. Units are meters.
+
+tt_[car, walk, bike, transit]: average weighted travel time in minutes between home and work place. The weights are based on population times jobs for each travel between a pair of individual and job. Units are minutes
+
+part_transit: the share (0.5 mean 50%) of the populaiton who has access to transit system. tt_transit is calculated for this population only.
+
+walktime: average weighted travel time in minutes between home and the entry station in the transit system (bus, metro, train, ...). The weights are based on population times jobs for each travel between a pair of individual and job. Units are minutes.
