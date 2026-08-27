@@ -11,7 +11,8 @@ Source: INSEE's BPE (Base Permanente des Équipements) 2025, geolocated edition.
 - `name`, `address`, `postal_code` — as recorded by INSEE (some are chain/franchise names, some are generic like "Ecole primaire").
 - `COMMUNE`, `nom_commune` — same commune code as the rest of the dataset, so this can be aggregated into commune- or IRIS-level counts (e.g. "how many pharmacies per commune") — see the root README's [Amenities section](../README.md#amenities-amenities) for how, in QGIS or Foursquare Studio.
 - `domain_code` / `domain` — one of 7 broad categories: Services aux particuliers, Commerces, Enseignement, Santé, Transports et déplacements, Sports/loisirs et culture, Tourisme.
-- `subdomain_code`, `type_code` — INSEE's finer classification (27 sub-domains, 217 precise equipment types in this filtered set). Left as INSEE's raw codes (e.g. `A129`) rather than translated, since the full type-level dictionary is a separate file. For readable labels, get `BPE25_anonymisee_varmod.csv` from [the same download page](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537) and join it on `type_code`.
+- `subdomain_code` / `subdomain` — INSEE's mid-level classification (27 sub-domains in this filtered set, e.g. `A1` → "Services publics").
+- `type_code` / `type` — INSEE's finest classification (217 precise equipment types, e.g. `A129` → "MAIRIE"). Labels for both come from `BPE25_anonymisee_varmod.csv`, INSEE's variable/modality dictionary (from [the same download page](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537)), joined on `subdomain_code`/`type_code`.
 - `geoloc_quality_code` — INSEE's raw geocoding-precision flag; not translated here since its exact meaning per value isn't in the base documentation.
 - `longitude`, `latitude` — WGS84, ready to map.
 

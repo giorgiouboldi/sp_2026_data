@@ -96,7 +96,7 @@ See [`employment/README.md`](employment/README.md) for what's left out (finer se
 
 - `name`, `address`, `postal_code`
 - `COMMUNE`, `nom_commune` — same commune code as everything else, so this can be aggregated to commune/IRIS level (see below)
-- `domain` — one of 7 broad categories (Services aux particuliers, Commerces, Enseignement, Santé, Transports et déplacements, Sports/loisirs et culture, Tourisme); `subdomain_code`, `type_code` — INSEE's finer classification, left as raw codes (see [`amenities/README.md`](amenities/README.md) for how to translate them)
+- `domain` — one of 7 broad categories (Services aux particuliers, Commerces, Enseignement, Santé, Transports et déplacements, Sports/loisirs et culture, Tourisme); `subdomain` and `type` narrow it down further (27 sub-domains, 217 precise equipment types), each with its raw INSEE code alongside (`subdomain_code`, `type_code`) — see [`amenities/README.md`](amenities/README.md) for the label source
 - `longitude`, `latitude` — WGS84, ready to map. There's no separate GeoJSON — in QGIS, add it via Layer → Add Layer → Add Delimited Text Layer with X/Y set to `longitude`/`latitude`.
 
 Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts per commune or IRIS means aggregating by location instead of joining by key:
