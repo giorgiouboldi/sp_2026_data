@@ -1,4 +1,16 @@
-# Guide to the La Rochelle commuting data
+# La Rochelle commuting data
+
+Open data on home-to-work commuting, population, income, and amenities for the La Rochelle area (Charente-Maritime, plus 2 communes in Vendée), at three levels of geographic detail.
+
+```
+.
+├── mobility/       travel times & distances (car, bike, walk, transit)
+├── geo-data/       map boundaries only (join key + geometry)
+├── population/     population by age, occupation, nationality
+├── income/         median income, poverty rate, inequality
+├── amenities/      schools, shops, healthcare, transit stops (point layer)
+└── README.md
+```
 
 ## Three levels of detail & geo layers
 
@@ -10,30 +22,30 @@ The data covers the La Rochelle commuting area at three sizes of area — same g
 
 Grid squares roll up into IRIS zones, which roll up into communes.
 
-Each level's map shape lives in `geo-data/` — geometry and join key only, no data values:
+Each level's map shape lives in [`geo-data/`](geo-data/) — geometry and join key only, no data values:
 
-- `geo-data/larochelle_c200_boundary.geojson` (also has `has_data`, since it covers every grid square, not just the ones with data)
-- `geo-data/larochelle_iris_boundary.geojson`
-- `geo-data/larochelle_communes_boundary.geojson`
+- [`geo-data/larochelle_c200_boundary.geojson`](geo-data/larochelle_c200_boundary.geojson) (also has `has_data`, since it covers every grid square, not just the ones with data)
+- [`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)
+- [`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson)
 
-Every data file below (in `mobility/` and `population/`) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). `communes_names.csv` (at the root) maps each `COMMUNE` code to its town name if you want readable labels instead of numbers.
+Every data file below (in [`mobility/`](mobility/) and [`population/`](population/)) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). [`geo-data/communes_names.csv`](geo-data/communes_names.csv) maps each `COMMUNE` code to its town name if you want readable labels instead of numbers.
 
-`amenities/` is the exception — its points already carry their own coordinates, so there's nothing to join. See the Amenities section below for how to aggregate it to a level instead.
+[`amenities/`](amenities/) is the exception — its points already carry their own coordinates, so there's nothing to join. See the Amenities section below for how to aggregate it to a level instead.
 
-## Mobility (`mobility/`)
+## Mobility ([`mobility/`](mobility/))
 
-Home-to-work travel times and distances. All three levels use the exact same columns (same wording as `mobility/codebook.txt`), weighted by population times jobs for each travel between a pair of individual and job:
+Home-to-work travel times and distances. All three levels use the exact same columns (same wording as [`mobility/codebook.txt`](mobility/codebook.txt)), weighted by population times jobs for each travel between a pair of individual and job:
 
 - **distance** — weighted average road distance from home to work place, in meters
 - **tt_car / tt_bike / tt_walk / tt_transit** — average weighted travel time in minutes between home and work place, by car, bike, walk, and transit
 - **part_transit** — the share (0.5 means 50%) of the population who has access to the transit system; `tt_transit` is calculated for this population only
 - **walktime** — average weighted travel time in minutes between home and the entry station in the transit system (bus, metro, train, ...)
 
-Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows).
+Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows). [`mobility/data.R`](mobility/data.R) is the script that originally built these from raw distance/employment data.
 
-## Population (`population/`)
+## Population ([`population/`](population/))
 
-Population figures at each level come from a different INSEE source, so the columns aren't identical level to level — each is listed separately.
+Population figures at each level come from a different INSEE source, so the columns aren't identical level to level — each is listed separately. Full sourcing and data-quality caveats (small-cell imputation, rounding, etc.) are in [`population/README.md`](population/README.md).
 
 **`larochelle_communes_population.csv`** (72 rows) — current legal population + a past-census time series:
 - `population_1990` … `population_2020` — past census counts; `population_2026` — the current official legal population (not a projection — INSEE names each "vintage" by the year it takes legal effect)
@@ -50,9 +62,7 @@ Population figures at each level come from a different INSEE source, so the colu
 - `households`, `households_1person`, `households_5plus_person`, `households_owner`, `households_single_parent`, `households_collective_housing`, `households_house`, `households_poor`, `households_social_housing`
 - `sum_dwelling_surface_m2`; `avg_niveau_de_vie_eur` (standard of living per person, a rough income indicator)
 
-Full sourcing and data-quality caveats (small-cell imputation, rounding, etc.) are in `population/README.md`.
-
-## Income (`income/`)
+## Income ([`income/`](income/))
 
 **`larochelle_iris_income.csv`** — only 48 of the 115 IRIS have values; INSEE itself withholds income figures for areas with too few households, so the rest simply aren't published, not missing due to a filtering error.
 
@@ -61,13 +71,15 @@ Full sourcing and data-quality caveats (small-cell imputation, rounding, etc.) a
 - `d9_d1_ratio`, `gini_index` — inequality measures
 - `income_share_activity_pct`, `income_share_pensions_pct`, `income_share_social_benefits_pct`, `income_share_taxes_pct` — where income comes from and what's deducted in taxes
 
-## Amenities (`amenities/`)
+See [`income/README.md`](income/README.md) for the still-missing commune-level income file.
+
+## Amenities ([`amenities/`](amenities/))
 
 **`larochelle_equipements.geojson`** / **`.csv`** (11,019 points) — every school, shop, healthcare facility, sports facility, transit stop, etc. in the area, geolocated:
 
 - `name`, `address`, `postal_code`
 - `COMMUNE`, `nom_commune` — same commune code as everything else, so this can be aggregated to commune/IRIS level (see below)
-- `domain` — one of 7 broad categories (Services aux particuliers, Commerces, Enseignement, Santé, Transports et déplacements, Sports/loisirs et culture, Tourisme); `subdomain_code`, `type_code` — INSEE's finer classification, left as raw codes
+- `domain` — one of 7 broad categories (Services aux particuliers, Commerces, Enseignement, Santé, Transports et déplacements, Sports/loisirs et culture, Tourisme); `subdomain_code`, `type_code` — INSEE's finer classification, left as raw codes (see [`amenities/README.md`](amenities/README.md) for how to translate them)
 - `longitude`, `latitude` (CSV only — the GeoJSON has these as the point geometry instead)
 
 Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts per commune or IRIS means aggregating by location instead of joining by key:
@@ -77,18 +89,18 @@ Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts p
 
 ## Sources
 
-Everything here traces back to a specific source — nothing is estimated or invented. Exact file names and data-quality caveats (small-cell imputation, income suppressed for small IRIS, etc.) are documented in each folder's own `README.md`; this is the list of providers.
+Everything here traces back to a specific source — nothing is estimated or invented. Exact file names and data-quality caveats (small-cell imputation, income suppressed for small IRIS, etc.) are documented in each folder's own README; this is the list of providers.
 
-- **Mobility** (`mobility/`) — provided directly for this project. The underlying home/work pairing traces to INSEE's census commuting survey: [Mobilités professionnelles : déplacements domicile-lieu de travail](https://www.insee.fr/fr/statistiques/8201899). The travel-time computation itself isn't a published dataset — it was pre-computed by whoever built the original project files, and isn't traceable further from what's here.
-- **Commune boundaries & population** (`geo-data/larochelle_communes_boundary.geojson`, `population/larochelle_communes_population.csv`) — [Géoplateforme17](https://www.geoplateforme17.fr), the Charente-Maritime departmental GIS platform (run by Soluris on behalf of the Conseil Départemental), accessed via QGIS rather than a direct file download.
-- **IRIS boundaries** (`geo-data/larochelle_iris_boundary.geojson`) — IGN, via [Géoportail's Contours IRIS page](https://www.geoportail.gouv.fr/donnees/contours-iris) (the WFS service actually used in QGIS is `data.geopf.fr/wfs/ows`, layer `STATISTICALUNITS.IRISGE:iris_ge` — that's an API endpoint, not a browsable page, so it 404s if opened directly in a browser).
-- **IRIS & 200m-grid population** (`population/larochelle_iris_population.csv`, `population/larochelle_c200_population.csv`) — INSEE: [Population en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8268806) and [Filosofi 2021, données carroyées 200m](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243).
-- **IRIS income** (`income/larochelle_iris_income.csv`) — INSEE: [Revenus, pauvreté et niveau de vie en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8229323).
-- **Amenities** (`amenities/`) — INSEE: [Base Permanente des Équipements (BPE) 2025](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537).
+- **Mobility** ([`mobility/`](mobility/)) — provided directly for this project. The underlying home/work pairing traces to INSEE's census commuting survey: [Mobilités professionnelles : déplacements domicile-lieu de travail](https://www.insee.fr/fr/statistiques/8201899). The travel-time computation itself isn't a published dataset — it was pre-computed upstream and isn't traceable further from what's in this repository.
+- **Commune boundaries & population** ([`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson), [`population/larochelle_communes_population.csv`](population/larochelle_communes_population.csv)) — [Géoplateforme17](https://www.geoplateforme17.fr), the Charente-Maritime departmental GIS platform (run by Soluris on behalf of the Conseil Départemental), accessed via QGIS rather than a direct file download.
+- **IRIS boundaries** ([`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)) — IGN, via [Géoportail's Contours IRIS page](https://www.geoportail.gouv.fr/donnees/contours-iris) (the WFS service actually used in QGIS is `data.geopf.fr/wfs/ows`, layer `STATISTICALUNITS.IRISGE:iris_ge` — that's an API endpoint, not a browsable page, so it 404s if opened directly in a browser).
+- **IRIS & 200m-grid population** ([`population/larochelle_iris_population.csv`](population/larochelle_iris_population.csv), [`population/larochelle_c200_population.csv`](population/larochelle_c200_population.csv)) — INSEE: [Population en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8268806) and [Filosofi 2021, données carroyées 200m](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243).
+- **IRIS income** ([`income/larochelle_iris_income.csv`](income/larochelle_iris_income.csv)) — INSEE: [Revenus, pauvreté et niveau de vie en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8229323).
+- **Amenities** ([`amenities/`](amenities/)) — INSEE: [Base Permanente des Équipements (BPE) 2025](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537).
 
 ## Other open data resources
 
-Beyond what's in this folder, these are good starting points for finding more data for the La Rochelle area or France generally:
+Beyond what's in this repository, these are good starting points for finding more data for the La Rochelle area or France generally:
 
 - **[data.gouv.fr](https://www.data.gouv.fr)** — France's national open data catalog, aggregates datasets from government bodies, agencies, and local authorities.
 - **[insee.fr](https://www.insee.fr)** — French statistics institute: population, employment, housing, income, business demography, at every geographic level from IRIS to national.
