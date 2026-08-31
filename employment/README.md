@@ -4,7 +4,7 @@
 
 Source: INSEE "Emploi-Activité en 2021", base `base-cc-emploi-pop-active-2021`.
 
-This is the flip side of the population files: instead of where people *live*, it counts jobs where they're physically *located* — how many jobs sit inside each commune's boundaries, regardless of where the workers themselves reside. Useful for identifying commuting destinations (e.g. La Rochelle city center will show far more jobs than its resident working population, since people commute in).
+The dataset counts jobs where they're physically *located* — how many jobs sit inside each commune's boundaries, regardless of where the workers themselves reside. Useful for identifying commuting destinations (e.g. La Rochelle city center will show far more jobs than its resident working population, since people commute in).
 
 - `jobs_total` — total number of jobs at the workplace in the commune.
 - `jobs_salaried`, `jobs_salaried_female`, `jobs_salaried_parttime` — salaried jobs, and the female / part-time subsets.
