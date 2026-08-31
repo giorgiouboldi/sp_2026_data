@@ -1,6 +1,4 @@
-# La Rochelle commuting data
-
-Open data on home-to-work commuting, real estate, energy, population, income, employment, and amenities for the La Rochelle area (Charente-Maritime, plus 2 communes in Vendée), at three levels of geographic detail.
+# La Rochelle data
 
 ```
 .
@@ -50,7 +48,7 @@ Home-to-work travel times and distances. All three levels use the exact same col
 - **part_transit** — the share (0.5 means 50%) of the population who has access to the transit system; `tt_transit` is calculated for this population only
 - **walktime** — average weighted travel time in minutes between home and the entry station in the transit system (bus, metro, train, ...)
 
-Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows). [`mobility/source/`](mobility/source/) has `codebook.txt` (the original column definitions) and `data.R` (the script that originally built these from raw distance/employment data).
+Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows). [`mobility/source/`](mobility/source/) has`data.R` (the script that originally built these from raw distance/employment data).
 
 **Professional km driven** — a second set of files, one column each: `larochelle_c200_kmpro.csv`, `larochelle_iris_kmpro.csv`, `larochelle_communes_kmpro.csv`.
 
@@ -85,7 +83,7 @@ Both files use the same columns — `median_income_eur`, `income_q1_eur`, `incom
 
 ## Employment ([`employment/`](employment/))
 
-The flip side of the population data: where jobs are physically located, not where the people holding them live. Useful for seeing where people commute *to*.
+Where jobs are physically located, not where the people holding them live. Useful for seeing where people commute *to*.
 
 **`larochelle_communes_jobs.csv`** (72 rows) — commune level only; INSEE doesn't publish jobs-at-workplace at IRIS or 200m-grid resolution:
 
@@ -99,7 +97,7 @@ See [`employment/README.md`](employment/README.md) for what's left out (finer se
 
 ## Real estate prices ([`real-estate/`](real-estate/))
 
-Residential transaction prices from DVF+ (CEREMA's enriched property-transaction register), at 2011 and 2024:
+Residential transaction prices at 2011 and 2024:
 
 **`larochelle_communes_prices.csv`** (72 rows) · **`larochelle_iris_prices.csv`** (113 of 115 IRIS)
 
@@ -107,11 +105,9 @@ Residential transaction prices from DVF+ (CEREMA's enriched property-transaction
 - `price_per_m2_2011_eur`, `price_per_m2_2024_eur` — average price per square meter that year, in euros
 - `annual_growth_rate_pct` — average annual growth rate in price per m² between 2011 and 2024
 
-The 2 Vendée IRIS have no recorded transactions and so no rows in the IRIS file — a genuine gap in the source, not a filtering error. See [`real-estate/README.md`](real-estate/README.md).
-
 ## Energy consumption & housing quality ([`energy/`](energy/))
 
-Annual electricity and gas consumption plus a 2024 housing-quality snapshot, from Agence ORE and data.gouv.fr. **Only electricity and gas are covered — oil and wood/biomass heating are not captured at all**, so zones with a lot of oil- or wood-heated housing will look artificially low here.
+Annual electricity and gas consumption plus a 2024 housing-quality snapshot. **Only electricity and gas are covered — oil and wood/biomass heating are not captured at all**, so zones with a lot of oil- or wood-heated housing might look artificially low here.
 
 **`larochelle_communes_energy.csv`** (72 communes) · **`larochelle_iris_energy.csv`** (113 of 115 IRIS) — multiple rows per zone (one per year × energy type, 2011–2024), not one row per zone like everything else in this repository:
 
@@ -135,8 +131,6 @@ Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts p
 - **Foursquare Studio:** open the amenities dataset → "⋮ More options" → **Spatial Join**. Target = a `geo-data/` boundary layer, Join dataset = the amenities points, choose an aggregation (Count, Sum, Mean, Median, ...).
 
 ## Sources
-
-Everything here traces back to a specific source — nothing is estimated or invented. Exact file names and data-quality caveats (small-cell imputation, income suppressed for small IRIS, etc.) are documented in each folder's own README; this is the list of providers.
 
 - **Mobility** ([`mobility/`](mobility/)) — provided directly for this project. The underlying home/work pairing traces to INSEE's census commuting survey: [Mobilités professionnelles : déplacements domicile-lieu de travail](https://www.insee.fr/fr/statistiques/8201899). The travel-time computation itself isn't a published dataset — it was pre-computed upstream and isn't traceable further from what's in this repository. `km_pa` (professional km driven) was computed the same way, from the same underlying commuting data.
 - **Commune boundaries & population** ([`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson), [`population/larochelle_communes_population.csv`](population/larochelle_communes_population.csv)) — [Géoplateforme17](https://www.geoplateforme17.fr), the Charente-Maritime departmental GIS platform (run by Soluris on behalf of the Conseil Départemental), accessed via QGIS rather than a direct file download.
