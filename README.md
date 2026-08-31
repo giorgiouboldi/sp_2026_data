@@ -1,14 +1,16 @@
 # La Rochelle commuting data
 
-Open data on home-to-work commuting, population, income, employment, and amenities for the La Rochelle area (Charente-Maritime, plus 2 communes in Vendée), at three levels of geographic detail.
+Open data on home-to-work commuting, real estate, energy, population, income, employment, and amenities for the La Rochelle area (Charente-Maritime, plus 2 communes in Vendée), at three levels of geographic detail.
 
 ```
 .
 ├── geo-data/       map boundaries only (join key + geometry)
-├── mobility/       travel times & distances (car, bike, walk, transit)
+├── mobility/       travel times & distances (car, bike, walk, transit) + professional km driven
 ├── population/     population by age, occupation, nationality
 ├── income/         median income, poverty rate, inequality
 ├── employment/     number of jobs by workplace location, sector, category
+├── real-estate/    residential transaction prices
+├── energy/         electricity & gas consumption, housing energy quality
 ├── amenities/      schools, shops, healthcare, transit stops (point layer)
 └── README.md
 ```
@@ -35,7 +37,7 @@ Each level's map shape lives in [`geo-data/`](geo-data/) — geometry and join k
 - [`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)
 - [`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson)
 
-Every data file below (in [`mobility/`](mobility/), [`population/`](population/), [`income/`](income/), and [`employment/`](employment/)) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). [`geo-data/communes_names.csv`](geo-data/communes_names.csv) maps each `COMMUNE` code to its town name if you want readable labels instead of numbers.
+Every data file below (in [`mobility/`](mobility/), [`population/`](population/), [`income/`](income/), [`employment/`](employment/), [`real-estate/`](real-estate/), and [`energy/`](energy/)) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). [`geo-data/communes_names.csv`](geo-data/communes_names.csv) maps each `COMMUNE` code to its town name if you want readable labels instead of numbers.
 
 [`amenities/`](amenities/) is the exception — its points already carry their own coordinates, so there's nothing to join. See the Amenities section below for how to aggregate it to a level instead.
 
@@ -49,6 +51,11 @@ Home-to-work travel times and distances. All three levels use the exact same col
 - **walktime** — average weighted travel time in minutes between home and the entry station in the transit system (bus, metro, train, ...)
 
 Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.csv` (116 rows) · `larochelle_communes_mobility.csv` (73 rows). [`mobility/source/`](mobility/source/) has `codebook.txt` (the original column definitions) and `data.R` (the script that originally built these from raw distance/employment data).
+
+**Professional km driven** — a second set of files, one column each: `larochelle_c200_kmpro.csv`, `larochelle_iris_kmpro.csv`, `larochelle_communes_kmpro.csv`.
+
+- `km_pa` — kilometers driven by car per year, per working person, for commuting.
+- `f_i`, `ind_18_64` (c200 file only) — number of working (active) people and number of working-age people in the grid cell; the c200 file also repeats `IRIS`/`COMMUNE` for convenience so it can be joined at any level without a separate lookup.
 
 ## Population ([`population/`](population/))
 
@@ -90,6 +97,29 @@ The flip side of the population data: where jobs are physically located, not whe
 
 See [`employment/README.md`](employment/README.md) for what's left out (finer sex/status-by-sector cross-tabs, 2015/2010 time series).
 
+## Real estate prices ([`real-estate/`](real-estate/))
+
+Residential transaction prices from DVF+ (CEREMA's enriched property-transaction register), at 2011 and 2024:
+
+**`larochelle_communes_prices.csv`** (72 rows) · **`larochelle_iris_prices.csv`** (113 of 115 IRIS)
+
+- `n_transactions_2011`, `n_transactions_2024` — number of residential sales that year
+- `price_per_m2_2011_eur`, `price_per_m2_2024_eur` — average price per square meter that year, in euros
+- `annual_growth_rate_pct` — average annual growth rate in price per m² between 2011 and 2024
+
+The 2 Vendée IRIS have no recorded transactions and so no rows in the IRIS file — a genuine gap in the source, not a filtering error. See [`real-estate/README.md`](real-estate/README.md).
+
+## Energy consumption & housing quality ([`energy/`](energy/))
+
+Annual electricity and gas consumption plus a 2024 housing-quality snapshot, from Agence ORE and data.gouv.fr. **Only electricity and gas are covered — oil and wood/biomass heating are not captured at all**, so zones with a lot of oil- or wood-heated housing will look artificially low here.
+
+**`larochelle_communes_energy.csv`** (72 communes) · **`larochelle_iris_energy.csv`** (113 of 115 IRIS) — multiple rows per zone (one per year × energy type, 2011–2024), not one row per zone like everything else in this repository:
+
+- `year`, `energy_type` (`electricity` or `gas`), `sites`, `consumption_mwh`, `consumption_avg_mwh_per_site`
+- `population_2024`, `electric_heating_share_pct`, `residences_principales_2024`, `dpe_de_count_2024`, `dpe_fg_count_2024` (the last two are homes rated D/E and F/G — "passoires énergétiques" — on France's DPE scale) — a 2024 snapshot repeated on every row for that zone
+
+Electricity is reported for every zone across all 14 years; gas only where a gas network reaches the zone. The 2 Vendée IRIS have no rows here either. Full column-by-column detail and the caveat in the colleague's own words are in [`energy/README.md`](energy/README.md).
+
 ## Amenities ([`amenities/`](amenities/))
 
 **`larochelle_equipements.csv`** (11,019 points) — every school, shop, healthcare facility, sports facility, transit stop, etc. in the area, geolocated:
@@ -108,12 +138,15 @@ Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts p
 
 Everything here traces back to a specific source — nothing is estimated or invented. Exact file names and data-quality caveats (small-cell imputation, income suppressed for small IRIS, etc.) are documented in each folder's own README; this is the list of providers.
 
-- **Mobility** ([`mobility/`](mobility/)) — provided directly for this project. The underlying home/work pairing traces to INSEE's census commuting survey: [Mobilités professionnelles : déplacements domicile-lieu de travail](https://www.insee.fr/fr/statistiques/8201899). The travel-time computation itself isn't a published dataset — it was pre-computed upstream and isn't traceable further from what's in this repository.
+- **Mobility** ([`mobility/`](mobility/)) — provided directly for this project. The underlying home/work pairing traces to INSEE's census commuting survey: [Mobilités professionnelles : déplacements domicile-lieu de travail](https://www.insee.fr/fr/statistiques/8201899). The travel-time computation itself isn't a published dataset — it was pre-computed upstream and isn't traceable further from what's in this repository. `km_pa` (professional km driven) was computed the same way, from the same underlying commuting data.
 - **Commune boundaries & population** ([`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson), [`population/larochelle_communes_population.csv`](population/larochelle_communes_population.csv)) — [Géoplateforme17](https://www.geoplateforme17.fr), the Charente-Maritime departmental GIS platform (run by Soluris on behalf of the Conseil Départemental), accessed via QGIS rather than a direct file download.
 - **IRIS boundaries** ([`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)) — IGN, via [Géoportail's Contours IRIS page](https://www.geoportail.gouv.fr/donnees/contours-iris) (the WFS service actually used in QGIS is `data.geopf.fr/wfs/ows`, layer `STATISTICALUNITS.IRISGE:iris_ge` — that's an API endpoint, not a browsable page, so it 404s if opened directly in a browser).
 - **IRIS & 200m-grid population** ([`population/larochelle_iris_population.csv`](population/larochelle_iris_population.csv), [`population/larochelle_c200_population.csv`](population/larochelle_c200_population.csv)) — INSEE: [Population en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8268806) and [Filosofi 2021, données carroyées 200m](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243).
 - **IRIS & commune income** ([`income/larochelle_iris_income.csv`](income/larochelle_iris_income.csv), [`income/larochelle_communes_income.csv`](income/larochelle_communes_income.csv)) — INSEE: [Revenus, pauvreté et niveau de vie en 2021 (IRIS)](https://www.insee.fr/fr/statistiques/8229323) and [Revenus, pauvreté et niveau de vie en 2021 (communes)](https://www.insee.fr/fr/statistiques/7756855?sommaire=7756859).
 - **Employment by workplace location** ([`employment/larochelle_communes_jobs.csv`](employment/larochelle_communes_jobs.csv)) — INSEE: [Emploi-Population active en 2021 (communes)](https://www.insee.fr/fr/statistiques/8202916?sommaire=8205947).
+- **Real estate prices** ([`real-estate/`](real-estate/)) — [DVF+ (CEREMA)](https://datafoncier.cerema.fr/donnees/donnee-dvf), the enriched version of France's public Demandes de Valeurs Foncières transaction register.
+- **Energy consumption** ([`energy/`](energy/)) — [Agence ORE](https://opendata.agenceore.fr), "Consommation annuelle d'électricité et de gaz par IRIS".
+- **Housing energy quality** ([`energy/`](energy/)) — [Nombre de passoires énergétiques par IRIS](https://www.data.gouv.fr/fr/datasets/nombre-de-passoires-energetiques-par-iris-dpe-apres-juillet-2021/) on data.gouv.fr.
 - **Amenities** ([`amenities/`](amenities/)) — INSEE: [Base Permanente des Équipements (BPE) 2025](https://www.insee.fr/fr/statistiques/8217525?sommaire=8217537).
 
 ## Other open data resources
