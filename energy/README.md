@@ -2,7 +2,7 @@
 
 Annual electricity and gas consumption, plus a housing-quality snapshot (share of homes heated electrically, and counts of poorly-insulated "energy sieve" homes), from Agence ORE (Observatoire des Réseaux Électriques et gaziers, France's grid-operator data hub) and data.gouv.fr.
 
-**Important caveat, flagged by the data provider: this covers electricity and gas only. Oil (fioul) and wood/biomass heating are not captured anywhere in this file.** A commune or IRIS with a lot of oil- or wood-heated housing will show comparatively low or misleading consumption here — this is a real limitation of the source data, not a processing gap.
+**Important caveat: this covers electricity and gas only. Oil (fioul) and wood/biomass heating are not captured anywhere in this file.** A commune or IRIS with a lot of oil- or wood-heated housing will show comparatively low or misleading consumption here — this is a real limitation of the source data, not a processing gap.
 
 ## `larochelle_communes_energy.csv` — 72 communes, join on `COMMUNE`
 
