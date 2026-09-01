@@ -2,7 +2,13 @@
 
 Where jobs physically sit, not where the workers live.
 
-**`larochelle_communes_jobs.csv`** — one snapshot (2021), broken down by salaried/self-employed, job category, and sector.
+**`larochelle_communes_jobs.csv`** — one snapshot (2021):
+
+- `jobs_total` — total jobs at the workplace in the commune
+- `jobs_salaried`, `jobs_salaried_female`, `jobs_salaried_parttime` — salaried jobs and the female/part-time subsets
+- `jobs_nonsalaried`, `jobs_nonsalaried_female`, `jobs_nonsalaried_parttime` — self-employed jobs and the female/part-time subsets
+- `jobs_cs1_agriculteurs` … `jobs_cs6_ouvriers` — jobs by socio-professional category (same PCS categories as `population/`'s `pop_cs1`…`pop_cs6`)
+- `jobs_agriculture`, `jobs_industry`, `jobs_construction`, `jobs_commerce_transport_services`, `jobs_public_admin_education_health` — jobs by broad sector
 
 **`larochelle_communes_jobs_timeseries.csv`** — just total jobs, but for every year INSEE has published: 1999, 2007–2022. Plus `change_pct_1999_2022` and `change_pct_2012_2022`, % change over those two periods. Pieced together from 8 different INSEE files since they don't publish one continuous series — some communes might show a jump if their boundaries changed at some point (like Cram-Chaban, see `amenities/README.md`).
 
