@@ -1,6 +1,5 @@
 # Real estate prices
 
-Residential property transaction prices, from DVF+ (Demandes de Valeurs Foncières enrichies), CEREMA's enriched version of France's public real-estate transaction register.
 
 ## `larochelle_communes_prices.csv` — 72 rows, join on `COMMUNE`
 
