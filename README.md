@@ -12,6 +12,7 @@ Open data on home-to-work commuting, real estate, energy, population, income, em
 ├── real-estate/    residential transaction prices
 ├── energy/         electricity & gas consumption, housing energy quality
 ├── amenities/      schools, shops, healthcare, transit stops (point layer)
+├── transit/        real bus & train routes and stops (GTFS)
 └── README.md
 ```
 
@@ -39,7 +40,7 @@ Each level's map shape lives in [`geo-data/`](geo-data/) — geometry and join k
 
 Every data file below (in [`mobility/`](mobility/), [`population/`](population/), [`income/`](income/), [`employment/`](employment/), [`real-estate/`](real-estate/), and [`energy/`](energy/)) is a plain CSV that joins onto the matching boundary file on that shared key. In QGIS: Layer → Properties → Joins (add the CSV, match the field on each side). [`geo-data/communes_names_points.csv`](geo-data/communes_names_points.csv) maps each `COMMUNE` code to its town name, plus a `longitude`/`latitude` reference point (each commune's official center point, from the French government's geo API) if you want readable labels or a quick point-on-map without loading the full boundary file — e.g. a symbol map sized by another column joined in from elsewhere.
 
-[`amenities/`](amenities/) is the exception — its points already carry their own coordinates, so there's nothing to join. See the Amenities section below for how to aggregate it to a level instead.
+[`amenities/`](amenities/) and [`transit/`](transit/) are the exception — their points/lines already carry their own coordinates, so there's nothing to join. See the Amenities section below for how to aggregate `amenities/` to a level instead.
 
 ## Mobility ([`mobility/`](mobility/))
 
@@ -56,6 +57,12 @@ Files: `larochelle_c200_mobility.csv` (5,455 rows) · `larochelle_iris_mobility.
 
 - `km_pa` — kilometers driven by car per year, per working person, for commuting.
 - `f_i`, `ind_18_64` (c200 file only) — number of working (active) people and number of working-age people in the grid cell; the c200 file also repeats `IRIS`/`COMMUNE` for convenience so it can be joined at any level without a separate lookup.
+
+**A caveat worth knowing before mapping `tt_transit`:** it's only averaged over the population the model considers to have any transit access at all (`part_transit`). In most of the 72 communes `part_transit` is under 1% — meaning `tt_transit` there reflects a near-empty sample, not a typical commute, and shouldn't be compared directly to `tt_car`. `part_transit` is genuinely bimodal across the area (42 communes under 2%, 30 communes from 33–58%, almost nothing in between) — a sensible cutoff around 0.1 cleanly separates "real signal" from "noise" if you're shading a map by transit reliability.
+
+## Public transportation routes & stops ([`transit/`](transit/))
+
+The actual bus, boat, and train infrastructure behind the `mobility/` transit-time columns above — real GTFS routes and stops, not modeled travel times. Three networks: Yélo (the La Rochelle agglomeration's own urban network — 122 routes, 536 stops, including night/Sunday/school-shuttle lines and 2 harbor boat shuttles), the Charente-Maritime interurban coach network (the rural periphery Yélo doesn't reach), and the SNCF train lines through La Rochelle. See [`transit/README.md`](transit/README.md) for full sourcing and what's simplified (representative route shapes kept from multiple variants, straight-line train routes since SNCF's feed has no track geometry).
 
 ## Population ([`population/`](population/))
 
@@ -141,6 +148,7 @@ Because these points have no `idINS`/`IRIS`/`COMMUNE` join key, getting counts p
 Everything here traces back to a specific source — nothing is estimated or invented. Exact file names and data-quality caveats (small-cell imputation, income suppressed for small IRIS, etc.) are documented in each folder's own README; this is the list of providers.
 
 - **Mobility** ([`mobility/`](mobility/)) — provided directly for this project. The underlying home/work pairing traces to INSEE's census commuting survey: [Mobilités professionnelles : déplacements domicile-lieu de travail](https://www.insee.fr/fr/statistiques/8201899). The travel-time computation itself isn't a published dataset — it was pre-computed upstream and isn't traceable further from what's in this repository. `km_pa` (professional km driven) was computed the same way, from the same underlying commuting data.
+- **Public transportation routes & stops** ([`transit/`](transit/)) — [transport.data.gouv.fr](https://transport.data.gouv.fr), France's national transit open data portal: [Réseau urbain Yélo](https://transport.data.gouv.fr/datasets/arrets-horaires-et-parcours-theoriques-des-reseaux-naq-lro-nva-m-1), [Réseau interurbain Charente-Maritime](https://transport.data.gouv.fr/datasets/arrets-horaires-et-parcours-theoriques-des-reseaux-naq-cma-nva-m/?locale=fr) (both Nouvelle-Aquitaine Mobilités), and [Réseau SNCF TGV, Intercités et TER](https://transport.data.gouv.fr/datasets/horaires-sncf) (SNCF) — all ODbL. See [`transit/README.md`](transit/README.md) for what's simplified.
 - **Commune boundaries & population** ([`geo-data/larochelle_communes_boundary.geojson`](geo-data/larochelle_communes_boundary.geojson), [`population/larochelle_communes_population.csv`](population/larochelle_communes_population.csv)) — [Géoplateforme17](https://www.geoplateforme17.fr), the Charente-Maritime departmental GIS platform (run by Soluris on behalf of the Conseil Départemental), accessed via QGIS rather than a direct file download.
 - **Commune center points** ([`geo-data/communes_names_points.csv`](geo-data/communes_names_points.csv) `longitude`/`latitude`) — the French government's official [geo API](https://geo.api.gouv.fr) (`geo.api.gouv.fr`), IGN-sourced; each commune's official reference point, not a geometric centroid of the boundary shape.
 - **IRIS boundaries** ([`geo-data/larochelle_iris_boundary.geojson`](geo-data/larochelle_iris_boundary.geojson)) — IGN, via [Géoportail's Contours IRIS page](https://www.geoportail.gouv.fr/donnees/contours-iris) (the WFS service actually used in QGIS is `data.geopf.fr/wfs/ows`, layer `STATISTICALUNITS.IRISGE:iris_ge` — that's an API endpoint, not a browsable page, so it 404s if opened directly in a browser).
@@ -159,11 +167,11 @@ Beyond what's in this repository, these are good starting points for finding mor
 - **[data.gouv.fr](https://www.data.gouv.fr)** — France's national open data catalog, aggregates datasets from government bodies, agencies, and local authorities.
 - **[insee.fr](https://www.insee.fr)** — French statistics institute: population, employment, housing, income, business demography, at every geographic level from IRIS to national.
 - **[Géoportail](https://www.geoportail.gouv.fr)** — France's official geospatial reference data: administrative boundaries, elevation, aerial imagery, cadastre, land use. (Its underlying API, IGN's Géoplateforme at `data.geopf.fr`, is what QGIS/GIS software connects to directly — that domain has no browsable homepage, so use Géoportail if you just want to look at or download data.)
-- **[transport.data.gouv.fr](https://transport.data.gouv.fr)** — France's national transit open data portal: real GTFS schedules and stops for bus/train/tram networks, including Nouvelle-Aquitaine's — directly relevant if you want to compare the modeled transit times here against a real network.
+- **[transport.data.gouv.fr](https://transport.data.gouv.fr)** — France's national transit open data portal: real GTFS schedules and stops for bus/train/tram networks nationwide — the source for [`transit/`](transit/) above.
 - **[Géoplateforme17](https://www.geoplateforme17.fr)** — the Charente-Maritime departmental portal already used for commune boundaries; has other local layers too (cadastre, housing, environment).
 - **[PIGMA](https://portail.pigma.org)** — Nouvelle-Aquitaine's regional geographic data platform, one level up from the department.
 - **[Eurostat](https://ec.europa.eu/eurostat)** — EU-wide statistics, useful if you want to compare La Rochelle to other European regions.
 
 ## Adding new data
 
-Any new dataset that has an `idINS`, `IRIS`, or `COMMUNE` column can be joined onto the matching geometry file the same way — geometry and data stay separate on purpose. A dataset with its own coordinates instead (like amenities) gets aggregated by location rather than joined by key.
+Any new dataset that has an `idINS`, `IRIS`, or `COMMUNE` column can be joined onto the matching geometry file the same way — geometry and data stay separate on purpose. A dataset with its own coordinates instead (like amenities or transit) gets aggregated by location rather than joined by key.
