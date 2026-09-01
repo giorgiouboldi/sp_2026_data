@@ -102,7 +102,7 @@ The flip side of the population data: where jobs are physically located, not whe
 - `jobs_cs1_agriculteurs` … `jobs_cs6_ouvriers` — jobs by socio-professional category (same PCS categories as `population/`'s `pop_cs1`…`pop_cs6`)
 - `jobs_agriculture`, `jobs_industry`, `jobs_construction`, `jobs_commerce_transport_services`, `jobs_public_admin_education_health` — jobs by broad sector
 
-See [`employment/README.md`](employment/README.md) for what's left out (finer sex/status-by-sector cross-tabs, 2015/2010 time series).
+**`larochelle_communes_jobs_timeseries.csv`** (72 rows) — just `jobs_total`, but for every year INSEE has published it: 1999, 2007–2022. See [`employment/README.md`](employment/README.md) for which of INSEE's 8 separate editions each year comes from.
 
 ## Real estate prices ([`real-estate/`](real-estate/))
 
