@@ -32,6 +32,22 @@ Source: INSEE "Filosofi 2021" 200m gridded data. Only cells with population appe
 
 **Caveats from INSEE's documentation:** cells with fewer than 11 households are statistically imputed for confidentiality (~79% of inhabited cells nationwide); individual living standards are capped at the département's 5th/95th percentile before summing; values are rounded to one decimal at source; ages 18–24 can look mis-located because students are counted at their parents' address.
 
+## `larochelle_c200_population_2017.csv` — 5,674 grid cells, join on `Idcar_200m` (= `idINS`)
+
+Same kind of data as the 2021 grid file above, but the 2017 Filosofi edition, kept as the raw source columns (French names, untranslated) rather than the curated set above — useful if you want to compare 2017 vs 2021 at grid level, or need a column the 2021 file doesn't carry (building age, for one).
+
+- `Idcar_200m` — the grid cell ID, same format as `idINS` elsewhere.
+- `Ind` — individuals; `Men` — households; `Men_1ind`/`Men_5ind` — 1-person/5+-person households; `Men_prop` — owner-occupied; `Men_fmp` — single-parent; `Men_pauv` — poor households; `Men_coll`/`Men_mais` — collective housing/houses.
+- `Ind_snv` — sum of standard of living (income); `Men_surf` — sum of dwelling surface.
+- `Log_av45`/`Log_45_70`/`Log_70_90`/`Log_ap90` — dwellings by construction period (before 1945, 1945–70, 1970–90, after 1990); `Log_inc` — dwellings with unknown construction date; `Log_soc` — social housing.
+- `Ind_0_3` … `Ind_80p` — population by age band; `Ind_inc` — individuals with unknown age.
+- `I_est_200`/`I_est_1km` — imputation flags (1 = this cell's/its parent 1km cell's values are imputed, not directly observed).
+- `Idcar_1km`/`Idcar_nat` — the parent 1km and "natural level" grid cell this one belongs to.
+- `Groupe` — cells with fewer than 11 households get merged into a group and share one set of values, for confidentiality; this is that group's ID.
+- `lcog_geo` — commune code(s) the cell overlaps (concatenated if it straddles more than one).
+
+Source: [Filosofi 2017, données carroyées 200m](https://www.insee.fr/fr/statistiques/6215138?sommaire=6215217), filtered from the full metropolitan France file to this study area's grid cells. [Full documentation (PDF)](https://www.insee.fr/fr/statistiques/fichier/6215647/documentation_DonneesCarroyees_filosofi2017.pdf) if you need more than what's above.
+
 Income data (median income, poverty rate, inequality) is in [`../income/README.md`](../income/README.md).
 
-Source pages, for reference: [IRIS population](https://www.insee.fr/fr/statistiques/8268806) · [Filosofi 200m grid](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243) · [Filosofi 200m documentation (PDF)](https://www.insee.fr/fr/statistiques/fichier/8735106/documentation_donnees-carroyees_filosofi2021.pdf)
+Source pages, for reference: [IRIS population](https://www.insee.fr/fr/statistiques/8268806) · [Filosofi 2021 200m grid](https://www.insee.fr/fr/statistiques/8735162?sommaire=8735243) · [Filosofi 2021 documentation (PDF)](https://www.insee.fr/fr/statistiques/fichier/8735106/documentation_donnees-carroyees_filosofi2021.pdf)
